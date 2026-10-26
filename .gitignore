@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+build/
+dist/
+*.egg-info/
+
+# 虚拟环境
+.venv/
+venv/
+env/
+
+# 测试与覆盖率
+.pytest_cache/
+.coverage
+htmlcov/
+
+# CodexForge 运行产物
+# .cforge 出现在被测工作区里，是守门状态（快照/报告），不是源码
+.cforge/
+runs/
+
+# 本地克隆的待测仓库（体积大，且是他人代码）
+.data/
+
+# 会话产物
+.workbuddy/
+
+# 本地环境与凭据 —— 绝不提交
+.env
+.env.*
+*.key
+*_creds.json
+*_token.txt
+
+# 编辑器
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

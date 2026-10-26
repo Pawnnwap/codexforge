@@ -1,0 +1,43 @@
+{
+ "name": "smoke",
+ "model": "cohere/north-mini-code:free",
+ "backend": "openrouter",
+ "tasks": [
+  {
+   "turns": 2,
+   "goal_met": true,
+   "stop_reason": "goal_met",
+   "quality_initial": 100.0,
+   "quality_final": 60.0,
+   "quality_delta": -40.0,
+   "quality_trend": [
+    60.0,
+    60.0
+   ],
+   "stagnation_hits": 0,
+   "elapsed_s": 161.44,
+   "task": "t1-multifile",
+   "task_name": "多文件小工具",
+   "codex_calls": 2,
+   "tokens": {
+    "input_tokens": 96315,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1758,
+    "reasoning_output_tokens": 0
+   },
+   "why_multi_turn": "4 个文件 + 测试，单轮容易漏文件或忘 __init__ 导出"
+  }
+ ],
+ "aggregate": {
+  "n_tasks": 1,
+  "goal_rate": 1.0,
+  "avg_turns": 2.0,
+  "avg_quality_final": 60.0,
+  "avg_quality_delta": -40.0,
+  "total_stagnation": 0,
+  "total_tokens": 0
+ },
+ "elapsed_s": 163.5,
+ "timestamp": "2026-10-23T09:04:22"
+}

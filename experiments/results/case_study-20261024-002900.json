@@ -1,0 +1,36 @@
+[
+ {
+  "repo": "E:\\pyprojects\\competition_hunter\\codexforge\\cforge\\watch",
+  "origin": "self-owned",
+  "before_score": 95.5,
+  "after_score": 95.5,
+  "delta": 0.0,
+  "n_smells_before": 4,
+  "n_smells_after": 4,
+  "high_before": 0,
+  "high_after": 0,
+  "clone_pairs_before": 0,
+  "clone_pairs_after": 0,
+  "accepted": false,
+  "rolled_back": false,
+  "report_path": "E:\\pyprojects\\competition_hunter\\codexforge\\cforge\\watch\\.cforge\\guardian\\report-20261024-002759.md",
+  "notes": []
+ },
+ {
+  "repo": "E:\\pyprojects\\competition_hunter\\codexforge\\cforge\\gateway",
+  "origin": "self-owned",
+  "before_score": 93.6,
+  "after_score": 95.8,
+  "delta": 2.2,
+  "n_smells_before": 3,
+  "n_smells_after": 2,
+  "high_before": 0,
+  "high_after": 0,
+  "clone_pairs_before": 0,
+  "clone_pairs_after": 0,
+  "accepted": true,
+  "rolled_back": false,
+  "report_path": "E:\\pyprojects\\competition_hunter\\codexforge\\cforge\\gateway\\.cforge\\guardian\\report-20261024-002900.md",
+  "notes": []
+ }
+]

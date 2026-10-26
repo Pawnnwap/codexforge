@@ -1,0 +1,186 @@
+{
+ "repo": {
+  "key": "httpx",
+  "url": "https://github.com/encode/httpx",
+  "license": "BSD-3-Clause",
+  "subdir": "httpx",
+  "why": "工业级 HTTP 客户端，注释与类型密度高，可检验度量在高成熟度代码上的假阳性"
+ },
+ "meta": {
+  "url": "https://github.com/encode/httpx",
+  "license_declared": "BSD-3-Clause",
+  "key": "httpx",
+  "clone": "reused",
+  "commit": "b5addb64f0161ff6bfe94c124ef76f6a1fba5254",
+  "commit_date": "2026-02-23T10:40:42Z",
+  "license_file": "LICENSE.md",
+  "license_head": "Copyright © 2019, [Encode OSS Ltd](https://www.encode.io/). All rights reserved. Redistribution and use in source and binary forms, with or without modification",
+  "path": "E:\\pyprojects\\competition_hunter\\codexforge\\.data\\cases\\httpx\\httpx"
+ },
+ "result": {
+  "baseline_score": 80.5,
+  "baseline_sloc": 7091,
+  "baseline_files": 23,
+  "baseline_smells": 19,
+  "baseline_high": 1,
+  "baseline_kinds": {
+   "long_function": 8,
+   "dead_assignment": 5,
+   "deep_nesting": 3,
+   "duplicate_branch": 2,
+   "todo_marker": 1
+  },
+  "current_score": 80.5,
+  "delta": 0.0,
+  "current_smells": 19,
+  "current_high": 1,
+  "elapsed_s": 205.4,
+  "events": [
+   {
+    "ran": true,
+    "reason": "整洁度 80.5 低于 99.0",
+    "accepted": false,
+    "quality_before": 80.5,
+    "quality_after": 80.5,
+    "stop_reason": "连续 1 轮改善不足，判定收敛",
+    "error": ""
+   }
+  ],
+  "report_files": [],
+  "remaining_smells": [
+   {
+    "kind": "long_function",
+    "path": "_api.py",
+    "line": 39,
+    "severity": "medium",
+    "detail": "request() 有 82 行（阈值 60）"
+   },
+   {
+    "kind": "todo_marker",
+    "path": "_auth.py",
+    "line": 267,
+    "severity": "low",
+    "detail": "遗留标记：# TODO: implement auth-int"
+   },
+   {
+    "kind": "long_function",
+    "path": "_client.py",
+    "line": 639,
+    "severity": "medium",
+    "detail": "__init__() 有 78 行（阈值 60）"
+   },
+   {
+    "kind": "long_function",
+    "path": "_client.py",
+    "line": 1353,
+    "severity": "medium",
+    "detail": "__init__() 有 78 行（阈值 60）"
+   },
+   {
+    "kind": "long_function",
+    "path": "_main.py",
+    "line": 26,
+    "severity": "medium",
+    "detail": "print_help() 有 75 行（阈值 60）"
+   },
+   {
+    "kind": "deep_nesting",
+    "path": "_main.py",
+    "line": 0,
+    "severity": "medium",
+    "detail": "最大嵌套 7 层（阈值 4）"
+   },
+   {
+    "kind": "deep_nesting",
+    "path": "_models.py",
+    "line": 0,
+    "severity": "medium",
+    "detail": "最大嵌套 5 层（阈值 4）"
+   },
+   {
+    "kind": "long_function",
+    "path": "_transports/asgi.py",
+    "line": 99,
+    "severity": "medium",
+    "detail": "handle_async_request() 有 89 行（阈值 60）"
+   },
+   {
+    "kind": "dead_assignment",
+    "path": "_transports/asgi.py",
+    "line": 154,
+    "severity": "low",
+    "detail": "send() 内有赋值后未使用的变量"
+   },
+   {
+    "kind": "dead_assignment",
+    "path": "_transports/asgi.py",
+    "line": 155,
+    "severity": "low",
+    "detail": "send() 内有赋值后未使用的变量"
+   },
+   {
+    "kind": "long_function",
+    "path": "_transports/default.py",
+    "line": 136,
+    "severity": "medium",
+    "detail": "__init__() 有 80 行（阈值 60）"
+   },
+   {
+    "kind": "long_function",
+    "path": "_transports/default.py",
+    "line": 280,
+    "severity": "medium",
+    "detail": "__init__() 有 80 行（阈值 60）"
+   },
+   {
+    "kind": "dead_assignment",
+    "path": "_transports/wsgi.py",
+    "line": 129,
+    "severity": "low",
+    "detail": "start_response() 内有赋值后未使用的变量"
+   },
+   {
+    "kind": "dead_assignment",
+    "path": "_transports/wsgi.py",
+    "line": 130,
+    "severity": "low",
+    "detail": "start_response() 内有赋值后未使用的变量"
+   },
+   {
+    "kind": "dead_assignment",
+    "path": "_transports/wsgi.py",
+    "line": 131,
+    "severity": "low",
+    "detail": "start_response() 内有赋值后未使用的变量"
+   },
+   {
+    "kind": "long_function",
+    "path": "_urlparse.py",
+    "line": 213,
+    "severity": "high",
+    "detail": "urlparse() 有 133 行（阈值 60）"
+   },
+   {
+    "kind": "deep_nesting",
+    "path": "_utils.py",
+    "line": 0,
+    "severity": "medium",
+    "detail": "最大嵌套 7 层（阈值 4）"
+   },
+   {
+    "kind": "duplicate_branch",
+    "path": "_utils.py",
+    "line": 65,
+    "severity": "medium",
+    "detail": "if/elif 分支体完全相同，条件可能写错或可合并"
+   },
+   {
+    "kind": "duplicate_branch",
+    "path": "_utils.py",
+    "line": 67,
+    "severity": "medium",
+    "detail": "if/elif 分支体完全相同，条件可能写错或可合并"
+   }
+  ]
+ }
+}

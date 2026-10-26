@@ -1,0 +1,194 @@
+{
+ "repo": {
+  "key": "starlette",
+  "url": "https://github.com/encode/starlette",
+  "license": "BSD-3-Clause",
+  "subdir": "starlette",
+  "why": "ASGI 框架核心，抽象层多，适合观察跨文件重复的误报率"
+ },
+ "meta": {
+  "url": "https://github.com/encode/starlette",
+  "license_declared": "BSD-3-Clause",
+  "key": "starlette",
+  "clone": "reused",
+  "commit": "8aa828ceaff764a2e57932fb42fdf105a47c4c83",
+  "commit_date": "2026-10-24T07:58:54-07:00",
+  "license_file": "LICENSE.md",
+  "license_head": "Copyright © 2018, [Encode OSS Ltd](https://www.encode.io/). All rights reserved. Redistribution and use in source and binary forms, with or without modification",
+  "path": "E:\\pyprojects\\competition_hunter\\codexforge\\.data\\cases\\starlette\\starlette"
+ },
+ "result": {
+  "baseline_score": 87.8,
+  "baseline_sloc": 5691,
+  "baseline_files": 36,
+  "baseline_smells": 28,
+  "baseline_high": 1,
+  "baseline_kinds": {
+   "long_function": 8,
+   "dead_assignment": 5,
+   "deep_nesting": 5,
+   "duplicate_branch": 4,
+   "long_line": 3,
+   "todo_marker": 3
+  },
+  "current_score": 87.8,
+  "delta": 0.0,
+  "current_smells": 28,
+  "current_high": 1,
+  "elapsed_s": 343.1,
+  "events": [
+   {
+    "ran": true,
+    "reason": "整洁度 87.8 低于 99.0",
+    "accepted": false,
+    "quality_before": 87.8,
+    "quality_after": 87.8,
+    "stop_reason": "连续 1 轮改善不足，判定收敛",
+    "error": ""
+   }
+  ],
+  "report_files": [],
+  "remaining_smells": [
+   {
+    "kind": "dead_assignment",
+    "path": "_exception_handler.py",
+    "line": 38,
+    "severity": "low",
+    "detail": "sender() 内有赋值后未使用的变量"
+   },
+   {
+    "kind": "long_function",
+    "path": "authentication.py",
+    "line": 25,
+    "severity": "medium",
+    "detail": "requires() 有 74 行（阈值 60）"
+   },
+   {
+    "kind": "long_function",
+    "path": "authentication.py",
+    "line": 32,
+    "severity": "medium",
+    "detail": "decorator() 有 65 行（阈值 60）"
+   },
+   {
+    "kind": "long_function",
+    "path": "middleware/base.py",
+    "line": 101,
+    "severity": "medium",
+    "detail": "__call__() 有 108 行（阈值 60）"
+   },
+   {
+    "kind": "long_function",
+    "path": "middleware/base.py",
+    "line": 112,
+    "severity": "medium",
+    "detail": "call_next() 有 87 行（阈值 60）"
+   },
+   {
+    "kind": "dead_assignment",
+    "path": "middleware/base.py",
+    "line": 169,
+    "severity": "low",
+    "detail": "call_next() 内有赋值后未使用的变量"
+   },
+   {
+    "kind": "dead_assignment",
+    "path": "middleware/base.py",
+    "line": 151,
+    "severity": "low",
+    "detail": "coro() 内有赋值后未使用的变量"
+   },
+   {
+    "kind": "duplicate_branch",
+    "path": "middleware/cors.py",
+    "line": 163,
+    "severity": "medium",
+    "detail": "if/elif 分支体完全相同，条件可能写错或可合并"
+   },
+   {
+    "kind": "long_line",
+    "path": "middleware/cors.py",
+    "line": 48,
+    "severity": "low",
+    "detail": "第 48 行 158 字符（阈值 120）"
+   },
+   {
+    "kind": "dead_assignment",
+    "path": "middleware/errors.py",
+    "line": 160,
+    "severity": "low",
+    "detail": "_send() 内有赋值后未使用的变量"
+   },
+   {
+    "kind": "long_line",
+    "path": "middleware/errors.py",
+    "line": 110,
+    "severity": "low",
+    "detail": "第 110 行 128 字符（阈值 120）"
+   },
+   {
+    "kind": "todo_marker",
+    "path": "middleware/exceptions.py",
+    "line": 26,
+    "severity": "low",
+    "detail": "遗留标记：self.debug = debug  # TODO: We ought to handle 404 cases if debug is set."
+   },
+   {
+    "kind": "long_function",
+    "path": "middleware/gzip.py",
+    "line": 106,
+    "severity": "medium",
+    "detail": "send_with_compression() 有 72 行（阈值 60）"
+   },
+   {
+    "kind": "deep_nesting",
+    "path": "middleware/gzip.py",
+    "line": 0,
+    "severity": "medium",
+    "detail": "最大嵌套 7 层（阈值 4）"
+   },
+   {
+    "kind": "duplicate_branch",
+    "path": "middleware/gzip.py",
+    "line": 108,
+    "severity": "medium",
+    "detail": "if/elif 分支体完全相同，条件可能写错或可合并"
+   },
+   {
+    "kind": "duplicate_branch",
+    "path": "middleware/gzip.py",
+    "line": 123,
+    "severity": "medium",
+    "detail": "if/elif 分支体完全相同，条件可能写错或可合并"
+   },
+   {
+    "kind": "todo_marker",
+    "path": "middleware/gzip.py",
+    "line": 12,
+    "severity": "low",
+    "detail": "遗留标记：# TODO(v2): We should rename `DEFAULT_EXCLUDED_CONTENT_TYPES` to `DEFAULT_EXCLUD"
+   },
+   {
+    "kind": "long_function",
+    "path": "middleware/opentelemetry.py",
+    "line": 47,
+    "severity": "medium",
+    "detail": "__call__() 有 80 行（阈值 60）"
+   },
+   {
+    "kind": "deep_nesting",
+    "path": "requests.py",
+    "line": 0,
+    "severity": "medium",
+    "detail": "最大嵌套 5 层（阈值 4）"
+   },
+   {
+    "kind": "long_function",
+    "path": "responses.py",
+    "line": 346,
+    "severity": "medium",
+    "detail": "__call__() 有 68 行（阈值 60）"
+   }
+  ]
+ }
+}

@@ -1,0 +1,85 @@
+{
+ "repo": {
+  "key": "smokeshow",
+  "url": "https://github.com/samuelcolvin/smokeshow",
+  "license": "MIT",
+  "subdir": "",
+  "why": "中等规模 CLI 工具，含 CLI/服务/存储多层，典型「个人项目长期演进」形态"
+ },
+ "meta": {
+  "url": "https://github.com/samuelcolvin/smokeshow",
+  "license_declared": "MIT",
+  "key": "smokeshow",
+  "clone": "reused",
+  "commit": "6e982a3d08dca518fc27cc6075c0d33916edba56",
+  "commit_date": "2025-01-07T21:00:54Z",
+  "license_file": "LICENSE",
+  "license_head": "The MIT License (MIT) Copyright (c) 2021 to present Samuel Colvin Permission is hereby granted, free of charge, to any person obtaining a copy of this software ",
+  "path": "E:\\pyprojects\\competition_hunter\\codexforge\\.data\\cases\\smokeshow"
+ },
+ "result": {
+  "baseline_score": 95.2,
+  "baseline_sloc": 509,
+  "baseline_files": 9,
+  "baseline_smells": 6,
+  "baseline_high": 0,
+  "baseline_kinds": {
+   "todo_marker": 5,
+   "long_function": 1
+  },
+  "current_score": 97.3,
+  "delta": 2.1,
+  "current_smells": 5,
+  "current_high": 0,
+  "elapsed_s": 306.9,
+  "events": [
+   {
+    "ran": true,
+    "reason": "整洁度 95.2 低于 99.0",
+    "accepted": true,
+    "quality_before": 95.2,
+    "quality_after": 97.3,
+    "stop_reason": "达到最大轮数 1",
+    "error": ""
+   }
+  ],
+  "report_files": [],
+  "remaining_smells": [
+   {
+    "kind": "todo_marker",
+    "path": "cli/tests/test_gh_integration.py",
+    "line": 65,
+    "severity": "low",
+    "detail": "遗留标记：env.set('SMOKESHOW_GITHUB_TOKEN', 'xxx')"
+   },
+   {
+    "kind": "todo_marker",
+    "path": "cli/tests/test_upload.py",
+    "line": 27,
+    "severity": "low",
+    "detail": "遗留标记：(tmp_path / 'bar.unknown_extension').write_text('xxx')"
+   },
+   {
+    "kind": "todo_marker",
+    "path": "cli/tests/test_upload.py",
+    "line": 43,
+    "severity": "low",
+    "detail": "遗留标记：'body': b'xxx',"
+   },
+   {
+    "kind": "todo_marker",
+    "path": "cli/tests/test_upload.py",
+    "line": 55,
+    "severity": "low",
+    "detail": "遗留标记：(tmp_path / 'bar.unknown_extension').write_text('xxx')"
+   },
+   {
+    "kind": "todo_marker",
+    "path": "cli/tests/test_upload.py",
+    "line": 67,
+    "severity": "low",
+    "detail": "遗留标记：(tmp_path / 'bar.unknown_extension').write_text('xxx')"
+   }
+  ]
+ }
+}

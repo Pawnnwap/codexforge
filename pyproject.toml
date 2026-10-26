@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "codexforge"
+version = "0.1.0"
+description = "Unattended code-quality guardian for solo developers (兴智杯 Track 172 submission)"
+requires-python = ">=3.11"
+# 运行时零第三方依赖：只用标准库。
+# 这是刻意的选择 —— 评审复现时不需要联网装包，也避免依赖树里的 copyleft 问题。
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0"]
+
+[project.scripts]
+cforge = "cforge.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cforge*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

@@ -1,0 +1,35 @@
+CodexForge
+Copyright 2026 黄太哲 (VladHong)
+
+本作品以 Apache License 2.0 授权（见 LICENSE 文件）。
+
+---
+
+本作品在运行时不包含任何第三方源代码副本，仅通过子进程与 HTTP API
+调用下列组件。此处声明用于满足 Apache-2.0 第 4(d) 条的归属要求，
+以及兴智杯参赛须知第 4 条「如涉及其他开源项目，需符合相关项目许可证合规要求」。
+
+## 以子进程方式调用的可执行程序
+
+  codex CLI 0.163.0
+  https://github.com/openai/codex
+  License: Apache-2.0
+  用法：本作品通过子进程启动 codex 执行代码修复任务。
+        未包含其源代码副本，属聚合（mere aggregation），不构成衍生作品。
+
+## 以 HTTP API 方式调用的模型服务
+
+  Intern-S2 / Intern-S1 Pro / InternVL 系列
+  提供方：上海人工智能实验室（书生 API 平台）
+  用法：通过官方 API 调用，不分发任何模型权重。
+
+  OpenRouter 及其上游模型（仅开发期替代方案）
+  用法：HTTP API 调用。
+
+## 运行时 Python 依赖
+
+  无。本作品运行时零第三方依赖，仅使用 Python 3.11+ 标准库。
+
+## 开发与测试依赖
+
+  pytest >= 8.0.0（MIT License），仅用于运行测试。

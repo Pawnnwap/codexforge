@@ -1,0 +1,36 @@
+[
+ {
+  "repo": "E:\\pyprojects\\competition_hunter\\codexforge\\cforge\\mcp",
+  "origin": "self-owned",
+  "before_score": 97.6,
+  "after_score": 100.0,
+  "delta": 2.4,
+  "n_smells_before": 1,
+  "n_smells_after": 0,
+  "high_before": 0,
+  "high_after": 0,
+  "clone_pairs_before": 0,
+  "clone_pairs_after": 0,
+  "accepted": true,
+  "rolled_back": false,
+  "report_path": "E:\\pyprojects\\competition_hunter\\codexforge\\cforge\\mcp\\.cforge\\guardian\\report-20261024-003909.md",
+  "notes": []
+ },
+ {
+  "repo": "E:\\pyprojects\\competition_hunter\\codexforge\\cforge\\skills",
+  "origin": "self-owned",
+  "before_score": 100.0,
+  "after_score": 100.0,
+  "delta": 0.0,
+  "n_smells_before": 0,
+  "n_smells_after": 0,
+  "high_before": 0,
+  "high_after": 0,
+  "clone_pairs_before": 0,
+  "clone_pairs_after": 0,
+  "accepted": false,
+  "rolled_back": false,
+  "report_path": "E:\\pyprojects\\competition_hunter\\codexforge\\cforge\\skills\\.cforge\\guardian\\report-20261024-004009.md",
+  "notes": []
+ }
+]

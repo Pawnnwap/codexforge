@@ -1,0 +1,45 @@
+{
+ "kind": "quality",
+ "sample": "E:\\pyprojects\\competition_hunter\\codexforge\\cforge",
+ "sloc": 3212,
+ "score": 86.8,
+ "n_smells": 26,
+ "by_kind": {
+  "long_function": 9,
+  "unused_import": 8,
+  "deep_nesting": 4,
+  "todo_marker": 3,
+  "dead_assignment": 2
+ },
+ "clones": {
+  "n_functions": 69,
+  "n_clone_pairs": 2,
+  "duplicate_ratio": 0.058,
+  "pairs": [
+   {
+    "a": "gateway/client.py:54",
+    "a_name": "_post_json",
+    "b": "harness/compat_proxy.py:206",
+    "b_name": "_upstream_post",
+    "similarity": 0.783,
+    "loc": [
+     36,
+     20
+    ]
+   },
+   {
+    "a": "quality/polish.py:137",
+    "a_name": "_snapshot",
+    "b": "quality/polish.py:166",
+    "b_name": "_restore",
+    "similarity": 0.757,
+    "loc": [
+     27,
+     18
+    ]
+   }
+  ]
+ },
+ "elapsed_s": 1.1,
+ "timestamp": "2026-10-23T08:21:55"
+}
