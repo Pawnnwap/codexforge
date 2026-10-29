@@ -298,10 +298,13 @@ def cmd_quality(args: argparse.Namespace) -> int:
 
     from collections import Counter
     if report.smells:
-        print("\n  问题分布：")
+        print("\n  问题分布（按修复分级）：")
+        from cforge.quality.repair import TIER_LABEL
+
         for kind, cnt in Counter(s.kind for s in report.smells).most_common():
             sev = next(s.severity for s in report.smells if s.kind == kind)
-            print(f"    {kind:<20} {cnt:>3}  [{sev}]")
+            tier = next(s.repair_tier for s in report.smells if s.kind == kind)
+            print(f"    {kind:<20} {cnt:>3}  [{sev}]  {TIER_LABEL.get(tier, tier)}")
 
     if not args.no_clones:
         clones = scan_clones(target)
@@ -315,6 +318,39 @@ def cmd_quality(args: argparse.Namespace) -> int:
         print(report.actionable_text(limit=30))
 
     return 0 if report.score >= args.min_score else 1
+
+
+def cmd_contract(args: argparse.Namespace) -> int:
+    """查看仓库约定（AGENTS.md）会被怎么注入修复 prompt。"""
+    from cforge.repo_contract import find_contract, load_contract, render_for_prompt
+
+    ws = Path(args.path or ".").resolve()
+    if not ws.is_dir():
+        print(f"目录不存在：{ws}")
+        return 2
+
+    found = find_contract(ws)
+    if found is None:
+        print(f"未找到 AGENTS.md（向上查了 3 层）：{ws}")
+        print("提示：这不是错误。没有约定时修复 prompt 不会多占任何 token。")
+        return 0
+
+    contract = load_contract(ws, max_chars=args.max_chars)
+    if contract is None:
+        print(f"找到 {found} 但内容为空或不可读")
+        return 1
+
+    print("=" * 68)
+    print(f"仓库约定 · {contract.path}")
+    print("=" * 68)
+    print(render_for_prompt(contract))
+    if args.raw:
+        print()
+        print(f"  原文件字符数  {contract.raw_chars}")
+        print(f"  实际注入字符  {contract.used_chars}")
+        print(f"  是否截断      {'是' if contract.truncated else '否'}")
+        print(f"  命中条目数    {len(contract.kept_rules)}")
+    return 0
 
 
 def cmd_longrun(args: argparse.Namespace) -> int:
@@ -590,6 +626,12 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--load", default="", help="加载指定技能正文")
     p.add_argument("--install", default="", help="把内置技能安装到指定目录")
     p.set_defaults(func=cmd_skills)
+
+    p = sub.add_parser("contract", help="查看本仓库的 AGENTS.md 约定（会被注入修复 prompt）")
+    p.add_argument("--path", default=".", help="工作区路径")
+    p.add_argument("--max-chars", type=int, default=1500, help="注入内容上限")
+    p.add_argument("--raw", action="store_true", help="额外打印原文件字符数等统计")
+    p.set_defaults(func=cmd_contract)
 
     p = sub.add_parser("layout", help="打印架构分层")
     p.set_defaults(func=cmd_layout)

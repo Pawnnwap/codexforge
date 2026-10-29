@@ -213,7 +213,24 @@ def build_fix_prompt(report: QualityReport, workspace: Path,
 
     body += ["### 约束", "", CONSTRAINTS]
 
+    # 仓库约定放在最后：实测约束放最前面时模型会当成背景说明而漏读问题清单，
+    # 所以「要改什么」在前、「边界」在后。AGENTS.md 属边界，顺次追加。
+    contract_block = _contract_block(workspace)
+    if contract_block:
+        body += ["", contract_block]
+
     return _wrap_task("\n".join(body))
+
+
+def _contract_block(workspace: Path) -> str:
+    """读取并渲染 AGENTS.md 约定；没有就不占任何 token。"""
+    try:
+        from cforge.repo_contract import load_contract, render_for_prompt
+
+        return render_for_prompt(load_contract(workspace))
+    except Exception:  # noqa: BLE001
+        # 约定读取失败绝不能阻断修复流程
+        return ""
 
 
 # 每类问题对应的具体动作。只说「这里有 66 行」模型会犹豫，
@@ -450,10 +467,18 @@ class ScriptedFixAgent:
         self.calls += 1
         changed = 0
 
-        # 只处理 unused_import —— 这是唯一能 100% 安全自动修的类型
+        # 分级由 cforge.quality.repair 统一决定，避免「这里写死 unused_import、
+        # 别处又写死一份清单」的两套标准。当前 auto 档只有 unused_import。
+        from cforge.quality.repair import is_auto_fixable, is_blocking
+
+        if any(is_blocking(s.kind) for s in report.smells):
+            if self.verbose:
+                print("    [scripted-fix] 存在阻断型问题（语法/读文件），跳过自动修复")
+            return False
+
         by_file: dict[str, list] = {}
         for s in report.smells:
-            if s.kind == "unused_import" and s.severity == "medium":
+            if is_auto_fixable(s.kind) and s.severity in ("medium", "high"):
                 by_file.setdefault(s.path, []).append(s)
 
         for rel, smells in by_file.items():

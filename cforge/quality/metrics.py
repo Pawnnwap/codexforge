@@ -51,7 +51,21 @@ class Smell:
         return {
             "kind": self.kind, "path": self.path, "line": self.line,
             "detail": self.detail, "severity": self.severity,
+            "repair_tier": self.repair_tier,
         }
+
+    @property
+    def repair_tier(self) -> str:
+        """修复分级：auto（可证安全）/ suggest（需判断）/ advisory（仅记录）。"""
+        from cforge.quality.repair import repair_tier
+
+        return repair_tier(self.kind)
+
+    @property
+    def blocking(self) -> bool:
+        from cforge.quality.repair import is_blocking
+
+        return is_blocking(self.kind)
 
     def __str__(self) -> str:
         return f"[{self.severity}] {self.path}:{self.line} {self.kind} — {self.detail}"
@@ -127,15 +141,37 @@ class QualityReport:
     def by_severity(self, sev: str) -> list[Smell]:
         return [s for s in self.smells if s.severity == sev]
 
-    def actionable_text(self, limit: int = 12) -> str:
-        """给 agent 的可执行反馈。按严重度排序，限制条数避免刷屏。"""
+    def actionable_text(self, limit: int = 12, *, workspace: Path | None = None,
+                        target_delta: float = 0.5) -> str:
+        """给 agent 的可执行反馈。按严重度排序，限制条数避免刷屏。
+
+        ## 补上 ACI 闭环（来自 SWE-agent 的教训）
+
+        SWE-agent 把「给智能体的接口」当独立设计对象：只报问题不够，
+        还要告诉它**改完怎么自检**，否则模型不知道自己的改动算不算成功，
+        容易反复微调或虚假宣布完成。
+
+        所以末尾固定给出自检命令与目标分数：分数是确定性的，
+        模型可以自己跑一次判断有没有达到目标，而不是靠猜。
+
+        ## 每条标注修复分级
+
+        `[可自动]` 的项有确定性修复器能处理；`[需判断]` 必须由人/模型决定；
+        `[仅记录]` 不该产生改动。这样 agent 不会把 TODO 标记也当成待修问题。
+        """
         if not self.smells and self.clone_pairs == 0:
             return ""
+        from cforge.quality.repair import TIER_LABEL, summarize
+
         order = {"high": 0, "medium": 1, "low": 2}
         ranked = sorted(self.smells, key=lambda s: (order.get(s.severity, 9), s.path, s.line))
-        lines = [f"整洁度 {self.score:.0f}/100，发现 {len(self.smells)} 处问题："]
+        tally = summarize([s.kind for s in self.smells])
+        head = (f"整洁度 {self.score:.0f}/100，发现 {len(self.smells)} 处问题"
+                f"（可自动 {tally['auto']}｜需判断 {tally['suggest']}"
+                f"｜仅记录 {tally['advisory']}）：")
+        lines = [head]
         for s in ranked[:limit]:
-            lines.append(f"  {s}")
+            lines.append(f"  [{TIER_LABEL.get(s.repair_tier, s.repair_tier)}] {s}")
         if self.clone_pairs:
             lines.append(
                 f"  另有 {self.clone_pairs} 对跨文件重复函数"
@@ -143,6 +179,11 @@ class QualityReport:
             )
         if len(ranked) > limit:
             lines.append(f"  …另有 {len(ranked) - limit} 处")
+
+        target = min(100.0, round(self.score + target_delta, 1))
+        where = str(workspace) if workspace is not None else "<工作区>"
+        lines.append(f"改完自检：python -m cforge.cli quality --path {where}"
+                     f"（目标 ≥ {target:.0f}）")
         return "\n".join(lines)
 
 

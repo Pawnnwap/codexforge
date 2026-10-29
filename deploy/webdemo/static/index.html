@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CodexForge · 确定性代码质量门</title>
+<style>
+  :root{
+    --bg:#0e1116; --panel:#161b22; --panel2:#1c232c; --line:#2a333f;
+    --ink:#e6edf3; --muted:#8b98a8; --accent:#4c9aff; --accent2:#2ec4b6;
+    --high:#ff6b6b; --med:#ffb454; --low:#7d8590; --ok:#3fb950; --bad:#f85149;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:15px/1.65 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+  }
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  header{
+    border-bottom:1px solid var(--line); padding:18px 28px;
+    display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;
+    background:linear-gradient(180deg,#141a22,#0e1116);
+  }
+  header h1{font-size:19px;margin:0;letter-spacing:.3px}
+  header .tag{
+    font-size:12px;color:var(--accent2);border:1px solid #2b4a47;
+    background:#122522;padding:2px 8px;border-radius:10px;
+  }
+  header .sub{color:var(--muted);font-size:13px}
+  main{max-width:1120px;margin:0 auto;padding:24px 28px 64px}
+  .lead{
+    color:var(--muted);font-size:14px;border-left:3px solid var(--accent);
+    padding:6px 0 6px 12px;margin:0 0 20px;
+  }
+  .tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  .tab{
+    padding:8px 16px;border:1px solid var(--line);border-radius:8px;
+    background:var(--panel);cursor:pointer;font-size:14px;color:var(--muted);
+    transition:.15s;
+  }
+  .tab.on{background:#1b2a3d;border-color:var(--accent);color:var(--ink)}
+  .tab:hover{color:var(--ink)}
+  .panel{display:none}
+  .panel.on{display:block}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:14px;
+  }
+  .card h3{margin:0 0 10px;font-size:14px;color:var(--muted);font-weight:600}
+  textarea{
+    width:100%;min-height:260px;resize:vertical;background:#0b0f14;
+    color:#d5dde6;border:1px solid var(--line);border-radius:8px;padding:12px;
+    font:13px/1.55 Consolas,"Cascadia Mono",monospace;outline:none;
+  }
+  textarea:focus{border-color:var(--accent)}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+  button{
+    background:var(--accent);color:#04121f;border:0;border-radius:8px;
+    padding:9px 18px;font-size:14px;font-weight:600;cursor:pointer;
+  }
+  button.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:400}
+  button:hover{filter:brightness(1.1)}
+  button:disabled{opacity:.5;cursor:default}
+  .hint{color:var(--muted);font-size:12.5px}
+  .score-wrap{display:flex;align-items:center;gap:18px;margin:6px 0 14px}
+  .score{
+    font-size:52px;font-weight:700;line-height:1;letter-spacing:-1px;
+    font-variant-numeric:tabular-nums;
+  }
+  .score small{font-size:16px;color:var(--muted);font-weight:400;margin-left:2px}
+  .metrics{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:13px}
+  .metrics b{color:var(--ink);font-variant-numeric:tabular-nums}
+  .smell{
+    display:flex;gap:10px;padding:9px 0;border-bottom:1px dashed #232c36;
+    font-size:13.5px;align-items:flex-start;
+  }
+  .smell:last-child{border-bottom:0}
+  .sev{
+    flex:0 0 auto;font-size:11px;padding:2px 7px;border-radius:6px;
+    font-weight:700;letter-spacing:.4px;margin-top:2px;
+  }
+  .sev.high{background:#3a1a1a;color:var(--high);border:1px solid #5c2626}
+  .sev.medium{background:#3a2c14;color:var(--med);border:1px solid #5c4526}
+  .sev.low{background:#20262e;color:var(--low);border:1px solid #2f3843}
+  .smell .loc{color:var(--muted);font-family:Consolas,monospace;font-size:12.5px}
+  .smell .kind{color:var(--accent2);font-size:12.5px;font-family:Consolas,monospace}
+  .verdict{
+    display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:10px;
+    margin-bottom:14px;font-size:16px;font-weight:600;
+  }
+  .verdict.ok{background:#0f2a18;border:1px solid #235c33;color:var(--ok)}
+  .verdict.bad{background:#2b1414;border:1px solid #632322;color:var(--bad)}
+  .verdict.warn{background:#2b2314;border:1px solid #5c4a1f;color:var(--med)}
+  .verdict .why{font-weight:400;font-size:13.5px;color:var(--muted)}
+  .empty{color:var(--muted);font-size:13.5px;padding:10px 0}
+  footer{
+    border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;
+    padding:18px 28px;text-align:center;
+  }
+  code.k{background:#0b0f14;border:1px solid var(--line);border-radius:4px;
+    padding:1px 5px;font-size:12.5px;font-family:Consolas,monospace}
+  .badge-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .badge{font-size:12px;color:var(--muted);border:1px solid var(--line);
+    border-radius:999px;padding:3px 10px}
+</style>
+</head>
+<body>
+<header>
+  <h1>CodexForge</h1>
+  <span class="tag">确定性质量门 · 在线体验</span>
+  <span class="sub">给一人公司 / 独立开发者的无人值守代码守门</span>
+</header>
+
+<main>
+  <p class="lead">
+    质量评估与语义守护是<strong>确定性分析</strong>（纯 AST，毫秒级，不调模型，结果可复现）；
+    点「书生建议」才调用书生大模型，给出可直接执行的重构动作。
+    两者分工明确：<strong>判定由代码事实负责，措辞由模型负责</strong>。
+  </p>
+
+  <div class="tabs">
+    <div class="tab on" data-panel="p-analyze">① 质量评估</div>
+    <div class="tab" data-panel="p-guard">② 语义守护</div>
+    <div class="tab" data-panel="p-about">③ 这是什么</div>
+  </div>
+
+  <!-- ① 质量评估 -->
+  <section class="panel on" id="p-analyze">
+    <div class="grid">
+      <div class="card">
+        <h3>粘贴一段 Python 代码</h3>
+        <textarea id="code" spellcheck="false" placeholder="把任意 .py 源码粘进来，或点下面示例"></textarea>
+        <div class="row">
+          <button id="btn-analyze">评估整洁度</button>
+          <button class="ghost" data-sample="长函数">示例：长函数</button>
+          <button class="ghost" data-sample="裸 except + 未使用 import">示例：裸 except</button>
+        </div>
+        <div class="row">
+          <button id="btn-fast" style="background:#2ec4b6">书生建议 · 快速（约 2s）</button>
+          <button class="ghost" id="btn-deep">书生建议 · 深度（约 30s）</button>
+        </div>
+        <div class="row"><span class="hint">纯本地 AST 分析；点「书生建议」才会调用书生大模型（限额 6 次/10 分钟）。</span></div>
+      </div>
+      <div class="card">
+        <h3>评估结果</h3>
+        <div id="analyze-out"><div class="empty">还没有结果。点「评估整洁度」。</div></div>
+        <div id="suggest-out"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ② 语义守护 -->
+  <section class="panel" id="p-guard">
+    <p class="hint" style="margin:0 0 12px">
+      这一层专治「分数没变、行为变了」。左边是原始代码，右边是某次「清理优化」，点对比看判定。
+    </p>
+    <div class="grid">
+      <div class="card">
+        <h3>改动前</h3>
+        <textarea id="before" spellcheck="false"></textarea>
+      </div>
+      <div class="card">
+        <h3>改动后</h3>
+        <textarea id="after" spellcheck="false"></textarea>
+      </div>
+    </div>
+    <div class="row">
+      <button id="btn-guard">判定这次改动</button>
+      <button class="ghost" id="btn-guard-sample">载入示例（stderr→stdout 破坏）</button>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3>判定结果</h3>
+      <div id="guard-out"><div class="empty">还没有结果。</div></div>
+    </div>
+  </section>
+
+  <!-- ③ 说明 -->
+  <section class="panel" id="p-about">
+    <div class="card">
+      <h3>三个不妥协的设计</h3>
+      <div class="smell"><span class="sev high">核心</span><div>
+        <b>反馈信号来自代码事实，不来自模型自评。</b>
+        文件在不在、AST 有几个 smell、函数签名有没有变 —— 可复现、可审计、可断言。
+        判官类方案（Agent-as-a-Judge）的致命弱点是自评不可靠、不可审计。
+      </div></div>
+      <div class="smell"><span class="sev high">核心</span><div>
+        <b>每个判定都给出人可读理由。</b>
+        「跑 / 不跑」「接受 / 回滚」都能解释，否则没人敢让一个黑盒守护进程常驻自己仓库。
+      </div></div>
+      <div class="smell"><span class="sev high">核心</span><div>
+        <b>净改善门 + 语义守护 + 全部可回滚。</b>
+        只有分数上升<em>且</em>行为未被破坏才接受；否则精确还原到改动前（含删掉 agent 新建的文件）。
+      </div></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3>真实第三方仓库实测</h3>
+      <div class="metrics" style="margin-top:6px">
+        <span>smokeshow <b>95.2 → 97.3 (+2.1)</b> 接受</span>
+        <span>httpx <b>80.5 → 80.5</b> 回滚</span>
+        <span>starlette <b>87.8 → 87.8</b> 回滚</span>
+      </div>
+      <p class="hint" style="margin:10px 0 0">
+        「1 接受 / 2 回滚」本身就是产品价值的证明：被回滚的两次，工作区回到与修改前完全一致。
+      </p>
+      <div class="badge-row">
+        <span class="badge">运行时零第三方依赖</span>
+        <span class="badge">366 个自动化测试</span>
+        <span class="badge">Apache-2.0</span>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3>书生大模型怎么用在这里</h3>
+      <div class="smell"><span class="sev high">定位</span><div>
+        <b>模型不负责判定，只负责措辞。</b>
+        改与不改由确定性代码事实决定（分数、签名、输出流），模型只把「该改什么」
+        翻译成一条可直接执行的动作。这样即使模型胡说，也不会让坏改动被放行。
+      </div></div>
+      <div class="smell"><span class="sev low">快速档</span><div>
+        <code class="k">intern-s1-mini</code> — 交互用，实测 2 秒返回，适合随手粘代码试。
+      </div></div>
+      <div class="smell"><span class="sev low">深度档</span><div>
+        <code class="k">intern-s2-preview-35b</code> — 实测约 12 秒，输出经 JSON 约束后可直接执行。
+        对话式产品里刻意不用带长思考链的旗舰档：单次 26 秒仍未收敛，而托管网关 60 秒会切断连接。
+      </div></div>
+      <div class="smell"><span class="sev low">限额</span><div>
+        每 IP 10 分钟 6 次（深度档 2 次），全站每日 400 次，相同代码 10 分钟内走缓存 ——
+        公网接口不设限额会被刷爆额度。限额触发时自动降级为规则建议，页面仍可用。
+      </div></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3>演示视频</h3>
+      <p class="hint" style="margin:0 0 8px">4 分 40 秒 · 1080P · 含需求拆解、工具链录屏、审查与最终效果。</p>
+      <video id="vid" controls preload="metadata" style="width:100%;border-radius:8px;background:#000"></video>
+      <div class="row"><a id="dl" href="#" download>下载视频（MP4）</a></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  CodexForge · 兴智杯第三届 · 赛道 160 ｜ 本页仅做确定性分析，不收集代码、不调用模型
+</footer>
+
+<script>
+const $ = (s) => document.querySelector(s);
+
+/* 托管平台要求分享口令（sharecode）才能访问资源。
+   首次带参访问会种 30 天 cookie，但无痕模式/第三方 cookie 受限时 cookie 可能不生效，
+   所以这里把所有同源请求都显式带上同一口令，保证页面永远可用。
+   （评审若直接打开带 sharecode 的链接，两种机制任意一种都能工作。） */
+const SC = new URLSearchParams(location.search).get('sharecode') || '';
+const withSC = (url) => {
+  if (!SC) return url;
+  return url + (url.includes('?') ? '&' : '?') + 'sharecode=' + encodeURIComponent(SC);
+};
+
+/* 标签切换 */
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('on'));
+    t.classList.add('on');
+    document.getElementById(t.dataset.panel).classList.add('on');
+  });
+});
+
+const SEV_LABEL = {high:'HIGH', medium:'MED', low:'LOW'};
+const scoreColor = (s) => s >= 90 ? 'var(--ok)' : (s >= 75 ? 'var(--med)' : 'var(--bad)');
+
+function renderReport(r) {
+  const smells = r.smells || [];
+  const list = smells.length ? smells.map(s => `
+    <div class="smell">
+      <span class="sev ${s.severity}">${SEV_LABEL[s.severity] || s.severity}</span>
+      <div>
+        <span class="kind">${s.kind}</span>
+        <span class="loc">${s.path}:${s.line}</span><br>
+        ${escapeHtml(s.detail)}
+      </div>
+    </div>`).join('')
+    : '<div class="empty">没有检出不整洁项。</div>';
+
+  return `
+    <div class="score-wrap">
+      <div class="score" style="color:${scoreColor(r.score)}">${r.score}<small>/100</small></div>
+      <div class="metrics">
+        <span>源码行 <b>${r.sloc}</b></span>
+        <span>函数 <b>${r.n_functions}</b></span>
+        <span>high <b>${r.by_severity.high}</b></span>
+        <span>medium <b>${r.by_severity.medium}</b></span>
+      </div>
+    </div>
+    ${list}`;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => (
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ① 分析 */
+$('#btn-analyze').addEventListener('click', async () => {
+  const code = $('#code').value;
+  if (!code.trim()) { $('#analyze-out').innerHTML = '<div class="empty">先粘一段代码。</div>'; return; }
+  const btn = $('#btn-analyze'); btn.disabled = true; btn.textContent = '分析中…';
+  try {
+    const res = await fetch(withSC('/api/analyze'), {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({filename:'snippet.py', code})
+    });
+    const data = await res.json();
+    $('#analyze-out').innerHTML = data.error
+      ? `<div class="empty">出错了：${escapeHtml(data.error)}</div>`
+      : renderReport(data);
+  } catch (e) {
+    $('#analyze-out').innerHTML = `<div class="empty">请求失败：${e}</div>`;
+  } finally { btn.disabled = false; btn.textContent = '评估整洁度'; }
+});
+
+/* 书生大模型建议 */
+async function askModel(depth, btn) {
+  const code = $('#code').value;
+  if (!code.trim()) { $('#suggest-out').innerHTML = '<div class="empty">先粘一段代码。</div>'; return; }
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = depth === 'deep' ? '模型推理中…（约 30s）' : '模型推理中…';
+  $('#suggest-out').innerHTML = '<div class="empty">正在调用书生模型…</div>';
+  try {
+    const res = await fetch(withSC('/api/suggest'), {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({filename:'snippet.py', code, depth})
+    });
+    const d = await res.json();
+    if (d.error) { $('#suggest-out').innerHTML = `<div class="empty">出错了：${escapeHtml(d.error)}</div>`; return; }
+    const byModel = d.source === 'intern';
+    const badge = byModel
+      ? `<span class="sev low" style="background:#12252b;color:#2ec4b6;border-color:#24514a">${d.model} · ${d.elapsed}s</span>`
+      : `<span class="sev medium">规则兜底（未调用模型）</span>`;
+    const note = d.degraded && d.reason
+      ? `<div class="hint" style="margin-top:8px">${escapeHtml(d.reason)}</div>` : '';
+    const cacheNote = d.cached ? '<span class="hint">（缓存命中，未重复调用）</span>' : '';
+    $('#suggest-out').innerHTML = `
+      <div class="card" style="margin-top:14px;background:#121a22;border-color:#24514a">
+        <h3>书生模型的改进动作 ${badge}</h3>
+        <div style="font-size:15px;line-height:1.7;margin:6px 0">${escapeHtml(d.suggestion)}</div>
+        <div class="hint">${cacheNote}基于已检出的 ${(d.report.smells||[]).length} 个问题给出；分数 ${d.report.score}/100</div>
+        ${note}
+      </div>`;
+  } catch (e) {
+    $('#suggest-out').innerHTML = `<div class="empty">请求失败：${e}</div>`;
+  } finally {
+    btn.disabled = false; btn.textContent = label;
+  }
+}
+$('#btn-fast').addEventListener('click', (e) => askModel('fast', e.currentTarget));
+$('#btn-deep').addEventListener('click', (e) => askModel('deep', e.currentTarget));
+
+/* ② 语义守护 */
+$('#btn-guard').addEventListener('click', async () => {
+  const before = $('#before').value, after = $('#after').value;
+  if (!before.trim() || !after.trim()) {
+    $('#guard-out').innerHTML = '<div class="empty">左右两边都要有代码。</div>'; return;
+  }
+  const btn = $('#btn-guard'); btn.disabled = true; btn.textContent = '判定中…';
+  try {
+    const res = await fetch(withSC('/api/guard'), {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({filename:'snippet.py', before, after})
+    });
+    const d = await res.json();
+    if (d.error) { $('#guard-out').innerHTML = `<div class="empty">出错了：${escapeHtml(d.error)}</div>`; return; }
+    const cls = d.guard_ok ? (d.delta >= 0.5 ? 'ok' : 'warn') : 'bad';
+    $('#guard-out').innerHTML = `
+      <div class="verdict ${cls}">
+        <span>${d.verdict}</span>
+        <span class="why">${escapeHtml(d.explain)}</span>
+      </div>
+      <div class="grid">
+        <div><h3>改动前 · ${d.before.score}</h3>${renderReport(d.before)}</div>
+        <div><h3>改动后 · ${d.after.score}</h3>${renderReport(d.after)}</div>
+      </div>`;
+  } catch (e) {
+    $('#guard-out').innerHTML = `<div class="empty">请求失败：${e}</div>`;
+  } finally { btn.disabled = false; btn.textContent = '判定这次改动'; }
+});
+
+/* 示例 */
+let SAMPLES = null, GUARD_CASE = null;
+async function loadSamples(){
+  try {
+    const r = await fetch(withSC('/api/samples')); const d = await r.json();
+    SAMPLES = d.samples; GUARD_CASE = d.guard_case;
+    if (GUARD_CASE) {
+      $('#before').value = GUARD_CASE.before;
+      $('#after').value = GUARD_CASE.after;
+    }
+  } catch(e){}
+}
+loadSamples();
+
+document.querySelectorAll('[data-sample]').forEach(b => {
+  b.addEventListener('click', () => {
+    if (!SAMPLES) return;
+    const s = SAMPLES[b.dataset.sample];
+    if (s) { $('#code').value = s.code; $('#btn-analyze').click(); }
+  });
+});
+(() => {
+  const v = document.getElementById('vid');
+  const d = document.getElementById('dl');
+  if (v) v.src = withSC('/demo.mp4');
+  if (d) d.href = withSC('/demo.mp4');
+})();
+
+$('#btn-guard-sample').addEventListener('click', () => {
+  if (GUARD_CASE) {
+    $('#before').value = GUARD_CASE.before;
+    $('#after').value = GUARD_CASE.after;
+    $('#btn-guard').click();
+  }
+});
+</script>
+</body>
+</html>

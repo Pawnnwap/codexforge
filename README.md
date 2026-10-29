@@ -146,7 +146,52 @@ $ python -m cforge.cli guard --workspace ./demo-guard --debt-score 99 --cooldown
 
 ---
 
-## 两个核心机制的实现
+## 三个核心机制的实现
+
+### 零、修复分级 + 仓库契约 + 自检闭环（v0.4 新增）
+
+这三项来自 2026-10 对头部开源项目的实测调研（见 `../docs/oss-agent-survey-20261029.md`）。
+
+**1. 修复分级（`cforge/quality/repair.py`）**
+
+此前只有「全自动」与「全不自动」两档，中间是空的。现在每个 smell 都带分级：
+
+| 分级 | 含义 | 当前包含 |
+|---|---|---|
+| `auto` | 可证安全，允许自动改 | 仅 `unused_import` |
+| `suggest` | 需要判断，只给动作 | 裸 except、长函数、深嵌套、重复分支等 |
+| `advisory` | 仅记录，不产生改动 | `todo_marker`、`read_error` |
+
+护栏：`tests/test_repair_tiers.py` 断言 `auto` **恰好只有** `unused_import`，
+以后想加类型必须先改这条断言 —— 等于强制过一道「是否真的可证安全」的评审。
+存在 `syntax_error` 时不执行任何自动重写。
+
+**2. 仓库契约（`AGENTS.md`，`cforge/repo_contract.py`）**
+
+调研发现 14 个头部仓库有 8 个根目录放了 `AGENTS.md`（ruff 20KB、opencode 16KB、
+crush 10KB、OpenHands 10KB），其中 ruff / semgrep 并不是 Agent 产品 ——
+它们是**被 Agent 开发的仓库**。这说明给 Agent 写仓库级契约已成事实标准。
+
+我们的做法是「读它，但不整份注入」：
+
+```bash
+python -m cforge.cli contract --path . --raw
+```
+
+只挑与改动相关的条目行，硬性截断 1500 字符，并标注是否截断。
+原因是实测教训：prompt 从 934 字符涨到 25K 字符时，模型改为先探索仓库、
+随后忘记任务。**注入约定不能把任务本身挤掉。**
+
+**3. 自检闭环（`QualityReport.actionable_text()`）**
+
+SWE-agent 的经验是把「给智能体的接口」当独立设计对象：只报问题不够，
+还要告诉它改完怎么验证。所以反馈末尾固定给出：
+
+```
+改完自检：python -m cforge.cli quality --path <ws>（目标 ≥ 54）
+```
+
+分数是确定性的，模型自己跑一次就能判断是否达标，不必靠猜或虚假宣布完成。
 
 ### 一、长程自主反馈
 
